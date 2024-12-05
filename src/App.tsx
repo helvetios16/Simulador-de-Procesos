@@ -1,13 +1,16 @@
 import "./App.css";
-import { Queue } from "./components";
+import { useGlobalTime } from "./store/GlobalTime";
+import { TimeSimulator } from "./components";
 
-function App() {
+export const App: React.FC = () => {
+  const time = useGlobalTime((state) => state.time);
   return (
     <>
+      <TimeSimulator />
+      <span style={{ color: "blue" }}>{time}</span>
+      <br />
+
       <h1>Processes</h1>
-      <Queue />
     </>
   );
-}
-
-export default App;
+};
