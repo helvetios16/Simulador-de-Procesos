@@ -1,5 +1,3 @@
-import { log } from "console";
-
 class Process {
   id: string;
   arrivalTime: number;
@@ -77,8 +75,8 @@ function roundRobin(
       // console.log(
       //   `${currentProcess.id} [${readyQueue.map((p) => p.id).join(", ")}]`,
       // );
-      // console.log(`${currentProcess.id} `);
-      process.stdout.write(`${currentProcess.id} `);
+      console.log(`${currentProcess.id} `);
+      // process.stdout.write(`${currentProcess.id} `);
 
       if (currentProcess.serviceTime === 0) {
         currentProcess.state = "finished";
@@ -123,15 +121,15 @@ function roundRobin(
 // }
 
 function main(): void {
-  const numProcess: number = 5;
+  const numProcess: number = 3;
   const processes: Process[] = [
-    new Process("A", 0, 4),
-    new Process("B", 2, 8),
-    new Process("C", 4, 3),
-    new Process("D", 5, 5),
-    new Process("E", 3, 1),
+    new Process("A", 0, 6),
+    new Process("B", 5, 4),
+    new Process("C", 3, 3),
+    // new Process("D", 5, 5),
+    // new Process("E", 3, 1),
   ];
-  const quantum: number = 2;
+  const quantum: number = 3;
 
   roundRobin(processes, numProcess, quantum);
 }
