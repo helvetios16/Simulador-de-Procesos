@@ -7,7 +7,7 @@ export const App: React.FC = () => {
   return (
     <>
       <TimeSimulator />
-      <span style={{ color: "blue" }}>{time}</span>
+      <span>{time}</span>
       <br />
 
       <h1>Processes</h1>

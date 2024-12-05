@@ -4,3 +4,8 @@
   padding: 2rem;
   text-align: center;
 }
+
+span {
+  color: grey;
+  font-size: 1.5rem;
+}
