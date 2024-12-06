@@ -4,8 +4,8 @@ export const processes_1: Process[] = [
   {
     id: "A",
     arrivalTime: 0,
-    serviceTime: 6,
-    remainingTime: 6,
+    serviceTime: 7,
+    remainingTime: 7,
     state: "waiting",
   },
   {
@@ -25,8 +25,8 @@ export const processes_1: Process[] = [
   {
     id: "D",
     arrivalTime: 10,
-    serviceTime: 4,
-    remainingTime: 4,
+    serviceTime: 7,
+    remainingTime: 7,
     state: "waiting",
   },
 ];

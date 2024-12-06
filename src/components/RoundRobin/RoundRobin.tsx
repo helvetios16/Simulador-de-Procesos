@@ -39,16 +39,14 @@ export const RoundRobin: React.FC<RoundRobinProps> = ({
     const timeExecuted = Math.min(quantum, currentProcess.remainingTime);
     currentProcess.remainingTime -= timeExecuted;
 
-    moveToReadyQueue(time + timeExecuted);
+    // moveToReadyQueue(time + timeExecuted);
 
     setInternalTime((t) => t + timeExecuted);
     setExecutionOrder((prev) => [...prev, currentProcess.id]);
 
     await delay(timeExecuted * 1000);
 
-    if (currentProcess.remainingTime === 0) {
-      currentProcess.state = "finished";
-    }
+    // moveToReadyQueue(time);
 
     if (currentProcess.remainingTime > 0) {
       setReadyQueue((prev) => [...prev, currentProcess]);
