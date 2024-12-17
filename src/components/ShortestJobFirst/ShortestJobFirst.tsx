@@ -1,17 +1,13 @@
 import { useEffect, useState } from "react";
 import { Process } from "../../interfaces/Process";
 import { useGlobalTime } from "../../store/GlobalTime";
-import "./RoundRobin.css";
+import "./ShortestJobFirst.css";
 
-interface RoundRobinProps {
-  quantum: number;
+interface SJFProps {
   initialProcesses: Process[];
 }
 
-export const RoundRobin: React.FC<RoundRobinProps> = ({
-  quantum,
-  initialProcesses,
-}) => {
+export const ShortestJobFirst: React.FC<SJFProps> = ({ initialProcesses }) => {
   const time: number = useGlobalTime((state) => state.time);
 
   const [waitingQueue, setWaitingQueue] = useState<Process[]>([
@@ -25,9 +21,28 @@ export const RoundRobin: React.FC<RoundRobinProps> = ({
     new Promise((resolve) => setTimeout(resolve, seg));
 
   const moveToReadyQueue = (t: number) => {
-    const toReady = waitingQueue.filter((p) => p.arrivalTime <= t);
-    setWaitingQueue((prev) => prev.filter((p) => p.arrivalTime > t));
-    setReadyQueue((prev) => [...prev, ...toReady]);
+    setWaitingQueue((prev) => {
+      let toReady = prev.filter((p) => p.arrivalTime <= t);
+      const remaining = prev.filter((p) => p.arrivalTime > t);
+
+      if (internalTime === 0) {
+        const firstProcess = toReady.find((p) => p.arrivalTime === 0);
+        if (firstProcess) {
+          toReady = [
+            firstProcess,
+            ...toReady.filter((p) => p.id !== firstProcess.id),
+          ];
+        }
+      }
+
+      setReadyQueue((prevReady) =>
+        [...prevReady, ...toReady].sort(
+          (a, b) => a.serviceTime - b.serviceTime,
+        ),
+      );
+
+      return remaining;
+    });
   };
 
   const executeProcess = async () => {
@@ -36,17 +51,13 @@ export const RoundRobin: React.FC<RoundRobinProps> = ({
     const currentProcess = readyQueue[0];
     setReadyQueue((prev) => prev.slice(1));
 
-    const timeExecuted = Math.min(quantum, currentProcess.remainingTime);
+    const timeExecuted = currentProcess.remainingTime;
     currentProcess.remainingTime -= timeExecuted;
 
     setInternalTime((t) => t + timeExecuted);
     setExecutionOrder((prev) => [...prev, currentProcess.id]);
 
     await delay(timeExecuted * 1000);
-
-    if (currentProcess.remainingTime > 0) {
-      setReadyQueue((prev) => [...prev, currentProcess]);
-    }
   };
 
   useEffect(() => {
@@ -62,8 +73,8 @@ export const RoundRobin: React.FC<RoundRobinProps> = ({
 
   return (
     <>
-      <h5>Roubin Robin</h5>
-      <div className="queue-roundrobin">
+      <h5>Shortest Job First</h5>
+      <div className="queue-sfj">
         {executionOrder.map((id, index) => (
           <span key={index} className="queue-item">
             {id}

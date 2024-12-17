@@ -1,7 +1,9 @@
 import "./App.css";
 import { useGlobalTime } from "./store/GlobalTime";
-import { RoundRobin, TimeSimulator } from "./components";
 import { processes_1 } from "./data/data";
+import { TimeSimulator } from "./components/TimeSimulator/TimeSimulator";
+import { RoundRobin } from "./components/RoundRobin/RoundRobin";
+import { ShortestJobFirst } from "./components/ShortestJobFirst/ShortestJobFirst";
 
 export const App: React.FC = () => {
   const time = useGlobalTime((state) => state.time);
@@ -17,6 +19,7 @@ export const App: React.FC = () => {
       <br />
       <h1>Processes</h1>
       <RoundRobin quantum={3} initialProcesses={sortedProcesses} />
+      {/* <ShortestJobFirst initialProcesses={sortedProcesses} /> */}
     </>
   );
 };
