@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
+import "./ShortestJobFirst.css";
 import { Process } from "../../interfaces/Process";
 import { useGlobalTime } from "../../store/GlobalTime";
-import "./ShortestJobFirst.css";
 
 interface SJFProps {
   initialProcesses: Process[];
@@ -20,6 +20,7 @@ export const ShortestJobFirst: React.FC<SJFProps> = ({ initialProcesses }) => {
   const delay = (seg: number) =>
     new Promise((resolve) => setTimeout(resolve, seg));
 
+  // Arreglar, en estado inicial porner el proceso de arrivalTime 0 al inicio y luego ordernar lo demás
   const moveToReadyQueue = (t: number) => {
     setWaitingQueue((prev) => {
       let toReady = prev.filter((p) => p.arrivalTime <= t);
@@ -73,7 +74,7 @@ export const ShortestJobFirst: React.FC<SJFProps> = ({ initialProcesses }) => {
 
   return (
     <>
-      <h5>Shortest Job First</h5>
+      <h5>SJF</h5>
       <div className="queue-sfj">
         {executionOrder.map((id, index) => (
           <span key={index} className="queue-item">

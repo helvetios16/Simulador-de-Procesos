@@ -1,21 +1,17 @@
 import { useEffect, useState } from "react";
 import { Process } from "../../interfaces/Process";
 import { useGlobalTime } from "../../store/GlobalTime";
-import "./RoundRobin.css";
 
-interface RoundRobinProps {
-  quantum: number;
-  initialProcesses: Process[];
+interface FCFSProps {
+  initialProcess: Process[];
 }
 
-export const RoundRobin: React.FC<RoundRobinProps> = ({
-  quantum,
-  initialProcesses,
+export const FirstComeFirstServe: React.FC<FCFSProps> = ({
+  initialProcess,
 }) => {
   const time: number = useGlobalTime((state) => state.time);
-
   const [waitingQueue, setWaitingQueue] = useState<Process[]>([
-    ...initialProcesses,
+    ...initialProcess,
   ]);
   const [readyQueue, setReadyQueue] = useState<Process[]>([]);
   const [executionOrder, setExecutionOrder] = useState<string[]>([]);
@@ -36,17 +32,13 @@ export const RoundRobin: React.FC<RoundRobinProps> = ({
     const currentProcess = readyQueue[0];
     setReadyQueue((prev) => prev.slice(1));
 
-    const timeExecuted = Math.min(quantum, currentProcess.remainingTime);
+    const timeExecuted = currentProcess.remainingTime;
     currentProcess.remainingTime -= timeExecuted;
 
     setInternalTime((t) => t + timeExecuted);
     setExecutionOrder((prev) => [...prev, currentProcess.id]);
 
     await delay(timeExecuted * 1000);
-
-    if (currentProcess.remainingTime > 0) {
-      setReadyQueue((prev) => [...prev, currentProcess]);
-    }
   };
 
   useEffect(() => {
@@ -62,8 +54,8 @@ export const RoundRobin: React.FC<RoundRobinProps> = ({
 
   return (
     <>
-      <h5>RR</h5>
-      <div className="queue-roundrobin">
+      <h5>FCFS</h5>
+      <div className="queue-sfj">
         {executionOrder.map((id, index) => (
           <span key={index} className="queue-item">
             {id}
