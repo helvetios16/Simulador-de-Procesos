@@ -21,6 +21,16 @@ export const RoundRobin: React.FC<RoundRobinProps> = ({
   const [executionOrder, setExecutionOrder] = useState<string[]>([]);
   const [internalTime, setInternalTime] = useState<number>(time);
 
+  const enQueueExecutionOrder = (str: string) => {
+    setExecutionOrder((prev) => {
+      const newItem = `${str}`;
+      if (prev.length >= 6) {
+        return [...prev.slice(1), newItem];
+      }
+      return [...prev, newItem];
+    });
+  };
+
   const delay = (seg: number) =>
     new Promise((resolve) => setTimeout(resolve, seg));
 
@@ -40,7 +50,8 @@ export const RoundRobin: React.FC<RoundRobinProps> = ({
     currentProcess.remainingTime -= timeExecuted;
 
     setInternalTime((t) => t + timeExecuted);
-    setExecutionOrder((prev) => [...prev, currentProcess.id]);
+    // setExecutionOrder((prev) => [...prev, currentProcess.id]);
+    enQueueExecutionOrder(currentProcess.id);
 
     await delay(timeExecuted * 1000);
 
