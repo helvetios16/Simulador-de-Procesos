@@ -18,12 +18,12 @@ export const RoundRobin: React.FC<RoundRobinProps> = ({
     ...initialProcesses,
   ]);
   const [readyQueue, setReadyQueue] = useState<Process[]>([]);
-  const [executionOrder, setExecutionOrder] = useState<string[]>([]);
+  const [executionOrder, setExecutionOrder] = useState<number[]>([]);
   const [internalTime, setInternalTime] = useState<number>(time);
 
-  const enQueueExecutionOrder = (str: string) => {
+  const enQueueExecutionOrder = (str: number) => {
     setExecutionOrder((prev) => {
-      const newItem = `${str}`;
+      const newItem = str;
       if (prev.length >= 6) {
         return [...prev.slice(1), newItem];
       }
@@ -35,8 +35,8 @@ export const RoundRobin: React.FC<RoundRobinProps> = ({
     new Promise((resolve) => setTimeout(resolve, seg));
 
   const moveToReadyQueue = (t: number) => {
-    const toReady = waitingQueue.filter((p) => p.arrivalTime <= t);
-    setWaitingQueue((prev) => prev.filter((p) => p.arrivalTime > t));
+    const toReady = waitingQueue.filter((p) => p.starttime <= t);
+    setWaitingQueue((prev) => prev.filter((p) => p.starttime > t));
     setReadyQueue((prev) => [...prev, ...toReady]);
   };
 
@@ -51,7 +51,7 @@ export const RoundRobin: React.FC<RoundRobinProps> = ({
 
     setInternalTime((t) => t + timeExecuted);
     // setExecutionOrder((prev) => [...prev, currentProcess.id]);
-    enQueueExecutionOrder(currentProcess.id);
+    enQueueExecutionOrder(currentProcess.pid);
 
     await delay(timeExecuted * 1000);
 

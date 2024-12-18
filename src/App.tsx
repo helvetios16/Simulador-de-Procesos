@@ -11,9 +11,7 @@ import { useGlobalTime } from "./store/GlobalTime";
 export const App: React.FC = () => {
   const time = useGlobalTime((state) => state.time);
 
-  const sortedProcesses = processes_1.sort(
-    (a, b) => a.arrivalTime - b.arrivalTime,
-  );
+  const sortedProcesses = processes_1.sort((a, b) => a.starttime - b.starttime);
 
   const sorted2 = sortedProcesses.map((process) => ({ ...process }));
   const otherSequence = sortedProcesses.map((process) => ({ ...process }));

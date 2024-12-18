@@ -14,15 +14,15 @@ export const FirstComeFirstServe: React.FC<FCFSProps> = ({
     ...initialProcess,
   ]);
   const [readyQueue, setReadyQueue] = useState<Process[]>([]);
-  const [executionOrder, setExecutionOrder] = useState<string[]>([]);
+  const [executionOrder, setExecutionOrder] = useState<number[]>([]);
   const [internalTime, setInternalTime] = useState<number>(time);
 
   const delay = (seg: number) =>
     new Promise((resolve) => setTimeout(resolve, seg));
 
   const moveToReadyQueue = (t: number) => {
-    const toReady = waitingQueue.filter((p) => p.arrivalTime <= t);
-    setWaitingQueue((prev) => prev.filter((p) => p.arrivalTime > t));
+    const toReady = waitingQueue.filter((p) => p.starttime <= t);
+    setWaitingQueue((prev) => prev.filter((p) => p.starttime > t));
     setReadyQueue((prev) => [...prev, ...toReady]);
   };
 
@@ -36,7 +36,7 @@ export const FirstComeFirstServe: React.FC<FCFSProps> = ({
     currentProcess.remainingTime -= timeExecuted;
 
     setInternalTime((t) => t + timeExecuted);
-    setExecutionOrder((prev) => [...prev, currentProcess.id]);
+    setExecutionOrder((prev) => [...prev, currentProcess.pid]);
 
     await delay(timeExecuted * 1000);
   };

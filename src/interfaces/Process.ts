@@ -1,9 +1,8 @@
-type processState = "waiting" | "ready" | "running" | "finished";
-
 export interface Process {
-  id: string;
-  arrivalTime: number;
+  pid: number;
+  name: string;
+  starttime: number;
   serviceTime: number;
   remainingTime: number;
-  state: processState;
+  priority: number;
 }

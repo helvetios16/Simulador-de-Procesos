@@ -14,7 +14,7 @@ export const ShortestJobFirst: React.FC<SJFProps> = ({ initialProcesses }) => {
     ...initialProcesses,
   ]);
   const [readyQueue, setReadyQueue] = useState<Process[]>([]);
-  const [executionOrder, setExecutionOrder] = useState<string[]>([]);
+  const [executionOrder, setExecutionOrder] = useState<number[]>([]);
   const [internalTime, setInternalTime] = useState<number>(time);
 
   const delay = (seg: number) =>
@@ -23,15 +23,15 @@ export const ShortestJobFirst: React.FC<SJFProps> = ({ initialProcesses }) => {
   // Arreglar, en estado inicial porner el proceso de arrivalTime 0 al inicio y luego ordernar lo demás
   const moveToReadyQueue = (t: number) => {
     setWaitingQueue((prev) => {
-      let toReady = prev.filter((p) => p.arrivalTime <= t);
-      const remaining = prev.filter((p) => p.arrivalTime > t);
+      let toReady = prev.filter((p) => p.starttime <= t);
+      const remaining = prev.filter((p) => p.starttime > t);
 
       if (internalTime === 0) {
-        const firstProcess = toReady.find((p) => p.arrivalTime === 0);
+        const firstProcess = toReady.find((p) => p.starttime === 0);
         if (firstProcess) {
           toReady = [
             firstProcess,
-            ...toReady.filter((p) => p.id !== firstProcess.id),
+            ...toReady.filter((p) => p.pid !== firstProcess.pid),
           ];
         }
       }
@@ -56,7 +56,7 @@ export const ShortestJobFirst: React.FC<SJFProps> = ({ initialProcesses }) => {
     currentProcess.remainingTime -= timeExecuted;
 
     setInternalTime((t) => t + timeExecuted);
-    setExecutionOrder((prev) => [...prev, currentProcess.id]);
+    setExecutionOrder((prev) => [...prev, currentProcess.pid]);
 
     await delay(timeExecuted * 1000);
   };
