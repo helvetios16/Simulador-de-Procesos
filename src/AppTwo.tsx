@@ -20,39 +20,57 @@ export const App: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isRunning, setIsRunning] = useState(false);
 
-  const distributeProcess = (process: Process) => {
+  const handleAddProcess = (process: Process) => {
     console.log(
-      `Distribuyendo proceso PID: ${process.pid} con prioridad: ${process.priority}`,
+      `Distribuyendo proceso PID: ${process.pid} con prioridad: ${process.priority} con tiempo de llegada: ${process.starttime}`,
     );
 
-    if (process.priority <= 10) {
+    if (process.priority <= 8) {
       setCpuOne([process]); // Round Robin
-    } else if (process.priority > 10 && process.priority <= 20) {
+    } else if (process.priority > 8 && process.priority <= 16) {
       setCpuTwo([process]); // SJF 1
-    } else if (process.priority > 20 && process.priority <= 30) {
+    } else if (process.priority > 16 && process.priority <= 24) {
       setCpuThree([process]); // SJF 2
     } else {
       setCpuFour([process]); // FCFS
     }
   };
 
-  const handleAddProcess = (newProcess: Process) => {
-    distributeProcess(newProcess);
-  };
-
   const handleJsonParsed = (data: object) => {
     const Data = data as Process[];
     setError(null);
-    console.log(Data);
 
-    const minus: number = Data[0].starttime;
+    console.log("Datos originales:", Data);
+
+    const minus: number = Data[0]?.starttime || 0; // Manejo de seguridad por si Data está vacío
 
     const adjustedProcesses = Data.map((process) => ({
       ...process,
-      starttime: Math.abs((process.starttime - minus) / 1000),
+      starttime: Math.round(Math.abs((process.starttime - minus) / 1000)),
     }));
 
-    console.log(adjustedProcesses);
+    const CpuOne: Process[] = [];
+    const CpuTwo: Process[] = [];
+    const CpuThree: Process[] = [];
+    const CpuFour: Process[] = [];
+
+    adjustedProcesses.forEach((process) => {
+      if (process.priority <= 8) {
+        CpuOne.push(process);
+      } else if (process.priority > 8 && process.priority <= 16) {
+        CpuTwo.push(process);
+      } else if (process.priority > 16 && process.priority <= 24) {
+        CpuThree.push(process);
+      } else {
+        CpuFour.push(process);
+      }
+    });
+
+    console.log("CPU 1 antes de actualizar el estado:", CpuOne);
+    setCpuOne([...CpuOne]);
+    setCpuTwo([...CpuTwo]);
+    setCpuThree([...CpuThree]);
+    setCpuFour([...CpuFour]);
 
     alert("JSON procesado");
   };

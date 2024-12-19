@@ -58,11 +58,7 @@ export const FirstComeFirstServe: React.FC<FCFSProps> = ({
 
     setInternalTime((t) => t + timeExecuted);
 
-    if (currentProcess.remainingTime > 0) {
-      enQueueExecutionOrder(currentProcess.pid, false);
-    } else {
-      enQueueExecutionOrder(currentProcess.pid, true);
-    }
+    enQueueExecutionOrder(currentProcess.pid, false);
 
     await delay(timeExecuted * 1000);
   };

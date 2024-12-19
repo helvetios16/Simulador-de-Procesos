@@ -29,11 +29,6 @@ export const RoundRobin: React.FC<RoundRobinProps> = ({
   const enQueueExecutionOrder = (id: number, st: boolean) => {
     setExecutionOrder((prev) => {
       const order: Order = { pid: id, state: st };
-
-      if (prev.includes(order)) {
-        return prev;
-      }
-
       if (prev.length >= 10) {
         return [...prev.slice(1), order];
       }
@@ -49,6 +44,8 @@ export const RoundRobin: React.FC<RoundRobinProps> = ({
     const toReady = waitingQueue.filter((p) => p.starttime <= t);
     setWaitingQueue((prev) => prev.filter((p) => p.starttime > t));
     setReadyQueue((prev) => [...prev, ...toReady]);
+
+    // console.log(`RR Listos: `, readyQueue);
   };
 
   const executeProcess = async () => {
@@ -60,23 +57,26 @@ export const RoundRobin: React.FC<RoundRobinProps> = ({
     const timeExecuted = Math.min(quantum, currentProcess.remainingTime);
     currentProcess.remainingTime -= timeExecuted;
 
-    setInternalTime((t) => t + timeExecuted);
+    enQueueExecutionOrder(
+      currentProcess.pid,
+      currentProcess.remainingTime === 0,
+    );
 
-    if (currentProcess.remainingTime > 0) {
-      enQueueExecutionOrder(currentProcess.pid, false);
-    } else {
-      enQueueExecutionOrder(currentProcess.pid, true);
-    }
+    // console.log("Ejecución", timeExecuted);
 
     await delay(timeExecuted * 1000);
+
+    setInternalTime((t) => t + timeExecuted);
 
     if (currentProcess.remainingTime > 0) {
       setReadyQueue((prev) => [...prev, currentProcess]);
     }
+    // console.log("readyQueue después de mover procesos:", readyQueue);
   };
 
   useEffect(() => {
-    setWaitingQueue([...initialProcesses, ...waitingQueue]);
+    setWaitingQueue([...initialProcesses]);
+    // console.log("Cola de espera actualizada:", initialProcesses);
   }, [initialProcesses]);
 
   useEffect(() => {
