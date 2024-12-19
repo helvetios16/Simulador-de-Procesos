@@ -4,14 +4,16 @@ import { Process } from "../../interfaces/Process";
 import { useGlobalTime } from "../../store/GlobalTime";
 
 interface SJFProps {
-  initialProcesses: Process[];
+  procesos: Process[];
+  tiempo: number;
+  opciones?: any;
 }
 
-export const ShortestJobFirst: React.FC<SJFProps> = ({ initialProcesses }) => {
+export const ShortestJobFirst: React.FC<SJFProps> = ({procesos, tiempo, opciones}) => {
   const time: number = useGlobalTime((state) => state.time);
 
   const [waitingQueue, setWaitingQueue] = useState<Process[]>([
-    ...initialProcesses,
+    ...procesos,
   ]);
   const [readyQueue, setReadyQueue] = useState<Process[]>([]);
   const [executionOrder, setExecutionOrder] = useState<string[]>([]);

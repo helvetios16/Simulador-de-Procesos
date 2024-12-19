@@ -3,19 +3,18 @@ import { Process } from "../../interfaces/Process";
 import { useGlobalTime } from "../../store/GlobalTime";
 import "./RoundRobin.css";
 
-interface RoundRobinProps {
-  quantum: number;
-  initialProcesses: Process[];
+interface RRProps {
+  procesos: Process[];
+  tiempo: number;
+  opciones?: any;
 }
 
-export const RoundRobin: React.FC<RoundRobinProps> = ({
-  quantum,
-  initialProcesses,
-}) => {
+
+export const RoundRobin:  React.FC<RRProps> = ({procesos, tiempo, opciones}) => {
   const time: number = useGlobalTime((state) => state.time);
 
   const [waitingQueue, setWaitingQueue] = useState<Process[]>([
-    ...initialProcesses,
+    ...procesos,
   ]);
   const [readyQueue, setReadyQueue] = useState<Process[]>([]);
   const [executionOrder, setExecutionOrder] = useState<string[]>([]);
@@ -46,7 +45,7 @@ export const RoundRobin: React.FC<RoundRobinProps> = ({
     const currentProcess = readyQueue[0];
     setReadyQueue((prev) => prev.slice(1));
 
-    const timeExecuted = Math.min(quantum, currentProcess.remainingTime);
+    const timeExecuted = Math.min(opciones, currentProcess.remainingTime);
     currentProcess.remainingTime -= timeExecuted;
 
     setInternalTime((t) => t + timeExecuted);

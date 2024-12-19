@@ -1,17 +1,19 @@
 import { useEffect, useState } from "react";
 import { Process } from "../../interfaces/Process";
 import { useGlobalTime } from "../../store/GlobalTime";
+import React from "react";
 
-interface FCFSProps {
-  initialProcess: Process[];
+
+interface FirstComeFirstServeProps {
+  procesos: Process[];
+  tiempo: number;
+  opciones?: any;
 }
 
-export const FirstComeFirstServe: React.FC<FCFSProps> = ({
-  initialProcess,
-}) => {
+export const FirstComeFirstServe: React.FC<FirstComeFirstServeProps> = ({procesos, tiempo, opciones}) => {
   const time: number = useGlobalTime((state) => state.time);
   const [waitingQueue, setWaitingQueue] = useState<Process[]>([
-    ...initialProcess,
+    ...procesos,
   ]);
   const [readyQueue, setReadyQueue] = useState<Process[]>([]);
   const [executionOrder, setExecutionOrder] = useState<string[]>([]);

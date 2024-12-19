@@ -1,5 +1,5 @@
 type processState = "waiting" | "ready" | "running" | "finished";
-
+import { ReactElement } from "react";
 export interface Process {
   id: string;
   arrivalTime: number;
@@ -7,3 +7,4 @@ export interface Process {
   remainingTime: number;
   state: processState;
 }
+
