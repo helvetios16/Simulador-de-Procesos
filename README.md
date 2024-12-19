@@ -1,7 +1,7 @@
 # Proyecto: [Simulador de Procesos]
 
 ## Descripción
-Este el proyecto de Simulador de Porceses
+Este el proyecto de Simulador de Procesos
 
 ## Integrantes:
 - [MAMANI CASILLA WILSON]
