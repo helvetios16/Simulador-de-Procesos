@@ -24,9 +24,11 @@ export const RoundRobin: React.FC<RoundRobinProps> = ({
   const enQueueExecutionOrder = (str: number) => {
     setExecutionOrder((prev) => {
       const newItem = str;
-      if (prev.length >= 6) {
+
+      if (prev.length >= 10) {
         return [...prev.slice(1), newItem];
       }
+
       return [...prev, newItem];
     });
   };
@@ -59,6 +61,10 @@ export const RoundRobin: React.FC<RoundRobinProps> = ({
       setReadyQueue((prev) => [...prev, currentProcess]);
     }
   };
+
+  useEffect(() => {
+    setWaitingQueue([...initialProcesses]);
+  }, [initialProcesses]);
 
   useEffect(() => {
     const processExecution = async () => {

@@ -17,6 +17,22 @@ export const FirstComeFirstServe: React.FC<FCFSProps> = ({
   const [executionOrder, setExecutionOrder] = useState<number[]>([]);
   const [internalTime, setInternalTime] = useState<number>(time);
 
+  const enQueueExecutionOrder = (str: number) => {
+    setExecutionOrder((prev) => {
+      const newItem = str;
+
+      if (prev.includes(newItem)) {
+        return prev;
+      }
+
+      if (prev.length >= 10) {
+        return [...prev.slice(1), newItem];
+      }
+
+      return [...prev, newItem];
+    });
+  };
+
   const delay = (seg: number) =>
     new Promise((resolve) => setTimeout(resolve, seg));
 
@@ -36,10 +52,15 @@ export const FirstComeFirstServe: React.FC<FCFSProps> = ({
     currentProcess.remainingTime -= timeExecuted;
 
     setInternalTime((t) => t + timeExecuted);
-    setExecutionOrder((prev) => [...prev, currentProcess.pid]);
+
+    enQueueExecutionOrder(currentProcess.pid);
 
     await delay(timeExecuted * 1000);
   };
+
+  useEffect(() => {
+    setWaitingQueue([...initialProcess]);
+  }, [initialProcess]);
 
   useEffect(() => {
     const processExecution = async () => {
