@@ -6,6 +6,11 @@ interface FCFSProps {
   initialProcess: Process[];
 }
 
+interface Order {
+  pid: number;
+  state: boolean;
+}
+
 export const FirstComeFirstServe: React.FC<FCFSProps> = ({
   initialProcess,
 }) => {
@@ -14,22 +19,22 @@ export const FirstComeFirstServe: React.FC<FCFSProps> = ({
     ...initialProcess,
   ]);
   const [readyQueue, setReadyQueue] = useState<Process[]>([]);
-  const [executionOrder, setExecutionOrder] = useState<number[]>([]);
+  const [executionOrder, setExecutionOrder] = useState<Order[]>([]);
   const [internalTime, setInternalTime] = useState<number>(time);
 
-  const enQueueExecutionOrder = (str: number) => {
+  const enQueueExecutionOrder = (id: number, st: boolean) => {
     setExecutionOrder((prev) => {
-      const newItem = str;
+      const order: Order = { pid: id, state: st };
 
-      if (prev.includes(newItem)) {
+      if (prev.includes(order)) {
         return prev;
       }
 
       if (prev.length >= 10) {
-        return [...prev.slice(1), newItem];
+        return [...prev.slice(1), order];
       }
 
-      return [...prev, newItem];
+      return [...prev, order];
     });
   };
 
@@ -53,13 +58,17 @@ export const FirstComeFirstServe: React.FC<FCFSProps> = ({
 
     setInternalTime((t) => t + timeExecuted);
 
-    enQueueExecutionOrder(currentProcess.pid);
+    if (currentProcess.remainingTime > 0) {
+      enQueueExecutionOrder(currentProcess.pid, false);
+    } else {
+      enQueueExecutionOrder(currentProcess.pid, true);
+    }
 
     await delay(timeExecuted * 1000);
   };
 
   useEffect(() => {
-    setWaitingQueue([...initialProcess]);
+    setWaitingQueue([...initialProcess, ...waitingQueue]);
   }, [initialProcess]);
 
   useEffect(() => {
@@ -76,10 +85,11 @@ export const FirstComeFirstServe: React.FC<FCFSProps> = ({
   return (
     <>
       <h5>FCFS</h5>
+
       <div className="queue-sfj">
-        {executionOrder.map((id, index) => (
-          <span key={index} className="queue-item">
-            {id}
+        {executionOrder.map((item, index) => (
+          <span key={index} className={`queue-item ${item.state ? "red" : ""}`}>
+            {item.pid}
           </span>
         ))}
       </div>

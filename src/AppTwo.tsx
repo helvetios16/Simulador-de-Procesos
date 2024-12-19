@@ -5,7 +5,6 @@ import { JsonUploader } from "./components/JsonUploader/JsonUploader";
 import { RoundRobin } from "./components/RoundRobin/RoundRobin";
 import { ShortestJobFirst } from "./components/ShortestJobFirst/ShortestJobFirst";
 import { TimeSimulator } from "./components/TimeSimulator/TimeSimulator";
-import { processes_1 } from "./data/data";
 import { useGlobalTime } from "./store/GlobalTime";
 import { Process } from "./interfaces/Process";
 import { ProcessForm } from "./components/ProcessForm/ProcessForm";
@@ -13,29 +12,54 @@ import { ProcessForm } from "./components/ProcessForm/ProcessForm";
 export const App: React.FC = () => {
   const time = useGlobalTime((state) => state.time);
 
-  const sortedProcesses = processes_1.sort((a, b) => a.starttime - b.starttime);
-
-  const sorted2 = sortedProcesses.map((process) => ({ ...process }));
-  const otherSequence = sortedProcesses.map((process) => ({ ...process }));
-  // const anotherSequence = sortedProcesses.map((process) => ({ ...process }));
-
-  const [dynamicProcess, setDynamicProcess] = useState<Process[]>([]);
-
-  const handleAddProcess = (newProcess: Process) => {
-    setDynamicProcess((prev) => [...prev, newProcess]);
-  };
+  const [cpuOne, setCpuOne] = useState<Process[]>([]);
+  const [cpuTwo, setCpuTwo] = useState<Process[]>([]);
+  const [cpuThree, setCpuThree] = useState<Process[]>([]);
+  const [cpuFour, setCpuFour] = useState<Process[]>([]);
 
   const [error, setError] = useState<string | null>(null);
   const [isRunning, setIsRunning] = useState(false);
 
+  const distributeProcess = (process: Process) => {
+    console.log(
+      `Distribuyendo proceso PID: ${process.pid} con prioridad: ${process.priority}`,
+    );
+
+    if (process.priority <= 10) {
+      setCpuOne([process]); // Round Robin
+    } else if (process.priority > 10 && process.priority <= 20) {
+      setCpuTwo([process]); // SJF 1
+    } else if (process.priority > 20 && process.priority <= 30) {
+      setCpuThree([process]); // SJF 2
+    } else {
+      setCpuFour([process]); // FCFS
+    }
+  };
+
+  const handleAddProcess = (newProcess: Process) => {
+    distributeProcess(newProcess);
+  };
+
   const handleJsonParsed = (data: object) => {
+    const Data = data as Process[];
     setError(null);
-    console.log("JSON procesado:", data);
+    console.log(Data);
+
+    const minus: number = Data[0].starttime;
+
+    const adjustedProcesses = Data.map((process) => ({
+      ...process,
+      starttime: Math.abs((process.starttime - minus) / 1000),
+    }));
+
+    console.log(adjustedProcesses);
+
+    alert("JSON procesado");
   };
 
   const handleError = (error: string) => {
     setError(error);
-    console.error("Error procesando el JSON:", error);
+    alert("Error procesando el JSON");
   };
 
   const handleStart = () => {
@@ -59,10 +83,10 @@ export const App: React.FC = () => {
         </button>
       </div>
       <h1>Processes</h1>
-      <RoundRobin quantum={3} initialProcesses={sortedProcesses} />
-      <ShortestJobFirst initialProcesses={sorted2} />
-      <ShortestJobFirst initialProcesses={otherSequence} />
-      <FirstComeFirstServe initialProcess={dynamicProcess} />
+      <RoundRobin quantum={3} initialProcesses={cpuOne} />
+      <ShortestJobFirst initialProcesses={cpuTwo} />
+      <ShortestJobFirst initialProcesses={cpuThree} />
+      <FirstComeFirstServe initialProcess={cpuFour} />
       <div style={{ marginTop: "20px" }}>
         <h3>Add Process</h3>
         <ProcessForm onAddProcess={handleAddProcess} />

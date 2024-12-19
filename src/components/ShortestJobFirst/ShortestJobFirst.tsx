@@ -7,6 +7,11 @@ interface SJFProps {
   initialProcesses: Process[];
 }
 
+interface Order {
+  pid: number;
+  state: boolean;
+}
+
 export const ShortestJobFirst: React.FC<SJFProps> = ({ initialProcesses }) => {
   const time: number = useGlobalTime((state) => state.time);
 
@@ -14,22 +19,22 @@ export const ShortestJobFirst: React.FC<SJFProps> = ({ initialProcesses }) => {
     ...initialProcesses,
   ]);
   const [readyQueue, setReadyQueue] = useState<Process[]>([]);
-  const [executionOrder, setExecutionOrder] = useState<number[]>([]);
+  const [executionOrder, setExecutionOrder] = useState<Order[]>([]);
   const [internalTime, setInternalTime] = useState<number>(time);
 
-  const enQueueExecutionOrder = (str: number) => {
+  const enQueueExecutionOrder = (id: number, st: boolean) => {
     setExecutionOrder((prev) => {
-      const newItem = str;
+      const order: Order = { pid: id, state: st };
 
-      if (prev.includes(newItem)) {
+      if (prev.includes(order)) {
         return prev;
       }
 
       if (prev.length >= 10) {
-        return [...prev.slice(1), newItem];
+        return [...prev.slice(1), order];
       }
 
-      return [...prev, newItem];
+      return [...prev, order];
     });
   };
 
@@ -69,15 +74,14 @@ export const ShortestJobFirst: React.FC<SJFProps> = ({ initialProcesses }) => {
 
     const timeExecuted = currentProcess.remainingTime;
     currentProcess.remainingTime -= timeExecuted;
-
     setInternalTime((t) => t + timeExecuted);
-    enQueueExecutionOrder(currentProcess.pid);
+    enQueueExecutionOrder(currentProcess.pid, false);
 
     await delay(timeExecuted * 1000);
   };
 
   useEffect(() => {
-    setWaitingQueue([...initialProcesses]);
+    setWaitingQueue([...initialProcesses, ...waitingQueue]);
   }, [initialProcesses]);
 
   useEffect(() => {
@@ -95,9 +99,9 @@ export const ShortestJobFirst: React.FC<SJFProps> = ({ initialProcesses }) => {
     <>
       <h5>SJF</h5>
       <div className="queue-sfj">
-        {executionOrder.map((id, index) => (
-          <span key={index} className="queue-item">
-            {id}
+        {executionOrder.map((item, index) => (
+          <span key={index} className={`queue-item ${item.state ? "red" : ""}`}>
+            {item.pid}
           </span>
         ))}
       </div>

@@ -8,6 +8,11 @@ interface RoundRobinProps {
   initialProcesses: Process[];
 }
 
+interface Order {
+  pid: number;
+  state: boolean;
+}
+
 export const RoundRobin: React.FC<RoundRobinProps> = ({
   quantum,
   initialProcesses,
@@ -18,18 +23,22 @@ export const RoundRobin: React.FC<RoundRobinProps> = ({
     ...initialProcesses,
   ]);
   const [readyQueue, setReadyQueue] = useState<Process[]>([]);
-  const [executionOrder, setExecutionOrder] = useState<number[]>([]);
+  const [executionOrder, setExecutionOrder] = useState<Order[]>([]);
   const [internalTime, setInternalTime] = useState<number>(time);
 
-  const enQueueExecutionOrder = (str: number) => {
+  const enQueueExecutionOrder = (id: number, st: boolean) => {
     setExecutionOrder((prev) => {
-      const newItem = str;
+      const order: Order = { pid: id, state: st };
 
-      if (prev.length >= 10) {
-        return [...prev.slice(1), newItem];
+      if (prev.includes(order)) {
+        return prev;
       }
 
-      return [...prev, newItem];
+      if (prev.length >= 10) {
+        return [...prev.slice(1), order];
+      }
+
+      return [...prev, order];
     });
   };
 
@@ -52,8 +61,12 @@ export const RoundRobin: React.FC<RoundRobinProps> = ({
     currentProcess.remainingTime -= timeExecuted;
 
     setInternalTime((t) => t + timeExecuted);
-    // setExecutionOrder((prev) => [...prev, currentProcess.id]);
-    enQueueExecutionOrder(currentProcess.pid);
+
+    if (currentProcess.remainingTime > 0) {
+      enQueueExecutionOrder(currentProcess.pid, false);
+    } else {
+      enQueueExecutionOrder(currentProcess.pid, true);
+    }
 
     await delay(timeExecuted * 1000);
 
@@ -63,7 +76,7 @@ export const RoundRobin: React.FC<RoundRobinProps> = ({
   };
 
   useEffect(() => {
-    setWaitingQueue([...initialProcesses]);
+    setWaitingQueue([...initialProcesses, ...waitingQueue]);
   }, [initialProcesses]);
 
   useEffect(() => {
@@ -81,9 +94,9 @@ export const RoundRobin: React.FC<RoundRobinProps> = ({
     <>
       <h5>RR</h5>
       <div className="queue-roundrobin">
-        {executionOrder.map((id, index) => (
-          <span key={index} className="queue-item">
-            {id}
+        {executionOrder.map((item, index) => (
+          <span key={index} className={`queue-item ${item.state ? "red" : ""}`}>
+            {item.pid}
           </span>
         ))}
       </div>

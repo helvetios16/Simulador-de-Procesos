@@ -54,14 +54,14 @@ export const JsonUploader: FC<JsonUploaderProps> = ({
     worker.onmessage = (messageEvent) => {
       const { success, data, error } = messageEvent.data;
       if (success) {
-        onJsonParsed(data); // Envía el JSON parseado al componente padre
+        onJsonParsed(data);
       } else {
-        onError(error); // Envía el error al componente padre
+        onError(error);
       }
-      worker.terminate(); // Finaliza el Worker
+      worker.terminate();
     };
 
-    worker.postMessage(file); // Envía el archivo al Worker
+    worker.postMessage(file);
   };
 
   return (
