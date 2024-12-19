@@ -6,6 +6,7 @@ import "./RoundRobin.css";
 interface RoundRobinProps {
   quantum: number;
   initialProcesses: Process[];
+  freeProcess: number | null;
 }
 
 interface Order {
@@ -16,6 +17,7 @@ interface Order {
 export const RoundRobin: React.FC<RoundRobinProps> = ({
   quantum,
   initialProcesses,
+  freeProcess,
 }) => {
   const time: number = useGlobalTime((state) => state.time);
 
@@ -68,11 +70,47 @@ export const RoundRobin: React.FC<RoundRobinProps> = ({
 
     setInternalTime((t) => t + timeExecuted);
 
+    if (freeProcess == currentProcess.pid) {
+      alert(`Proceso con PID: ${freeProcess} eliminado de la ejecución`);
+      return;
+    }
+
     if (currentProcess.remainingTime > 0) {
       setReadyQueue((prev) => [...prev, currentProcess]);
     }
-    // console.log("readyQueue después de mover procesos:", readyQueue);
   };
+
+  useEffect(() => {
+    if (freeProcess) {
+      let processFound = false;
+
+      setWaitingQueue((prevQueue) => {
+        const updatedQueue = prevQueue.filter((p) => p.pid !== freeProcess);
+        if (updatedQueue.length !== prevQueue.length) {
+          processFound = true;
+          alert(
+            `Proceso con PID: ${freeProcess} eliminado de la cola de espera`,
+          );
+        }
+        return updatedQueue;
+      });
+
+      setReadyQueue((prevQueue) => {
+        const updatedQueue = prevQueue.filter((p) => p.pid !== freeProcess);
+        if (updatedQueue.length !== prevQueue.length) {
+          processFound = true;
+          alert(
+            `Proceso con PID: ${freeProcess} eliminado de la cola de listos`,
+          );
+        }
+        return updatedQueue;
+      });
+
+      if (!processFound) {
+        alert("El proceso no existe en ninguna cola");
+      }
+    }
+  }, [freeProcess]);
 
   useEffect(() => {
     setWaitingQueue([...initialProcesses]);

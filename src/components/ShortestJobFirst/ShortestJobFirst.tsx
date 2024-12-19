@@ -5,6 +5,7 @@ import { useGlobalTime } from "../../store/GlobalTime";
 
 interface SJFProps {
   initialProcesses: Process[];
+  freeProcess: number | null;
 }
 
 interface Order {
@@ -12,7 +13,10 @@ interface Order {
   state: boolean;
 }
 
-export const ShortestJobFirst: React.FC<SJFProps> = ({ initialProcesses }) => {
+export const ShortestJobFirst: React.FC<SJFProps> = ({
+  initialProcesses,
+  freeProcess,
+}) => {
   const time: number = useGlobalTime((state) => state.time);
 
   const [waitingQueue, setWaitingQueue] = useState<Process[]>([
@@ -77,8 +81,45 @@ export const ShortestJobFirst: React.FC<SJFProps> = ({ initialProcesses }) => {
     setInternalTime((t) => t + timeExecuted);
     enQueueExecutionOrder(currentProcess.pid, false);
 
+    if (freeProcess == currentProcess.pid) {
+      alert(`Proceso con PID: ${freeProcess} eliminado de la ejecución`);
+      return;
+    }
+
     await delay(timeExecuted * 1000);
   };
+
+  useEffect(() => {
+    if (freeProcess) {
+      let processFound = false;
+
+      setWaitingQueue((prevQueue) => {
+        const updatedQueue = prevQueue.filter((p) => p.pid !== freeProcess);
+        if (updatedQueue.length !== prevQueue.length) {
+          processFound = true;
+          alert(
+            `Proceso con PID: ${freeProcess} eliminado de la cola de espera`,
+          );
+        }
+        return updatedQueue;
+      });
+
+      setReadyQueue((prevQueue) => {
+        const updatedQueue = prevQueue.filter((p) => p.pid !== freeProcess);
+        if (updatedQueue.length !== prevQueue.length) {
+          processFound = true;
+          alert(
+            `Proceso con PID: ${freeProcess} eliminado de la cola de listos`,
+          );
+        }
+        return updatedQueue;
+      });
+
+      if (!processFound) {
+        alert("El proceso no existe en ninguna cola");
+      }
+    }
+  }, [freeProcess]);
 
   useEffect(() => {
     setWaitingQueue([...initialProcesses, ...waitingQueue]);
